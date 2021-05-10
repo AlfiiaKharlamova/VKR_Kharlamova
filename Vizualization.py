@@ -78,7 +78,7 @@ def retrieve_proc_text(media_id):
 # In[ ]:
 
 
-def friq_graph(color, word, file_name):
+def freq_graph(color, word, file_name):
     
     """The program calculates the frequency of entered by the user word in the text 
     and total number of words. 
@@ -242,20 +242,20 @@ def friq_graph(color, word, file_name):
 def words_top(processed_words_media):
     words_list_start = processed_words_media
     words_list = []
-    words_friq = {}
+    words_freq = {}
 
     for i in words_list_start:
         words_list.append(i.capitalize())
 
     for w in words_list:
-        if w not in words_friq.keys():
-            words_friq[w] = 1
+        if w not in words_freq.keys():
+            words_freq[w] = 1
         else:
-            words_friq[w] = words_friq.get(w) + 1
+            words_freq[w] = words_freq.get(w) + 1
 
-    sorted_words_friq = sorted(words_friq.items(), key=lambda x: x[1], reverse=True)[0:15]
+    sorted_words_freq = sorted(words_freq.items(), key=lambda x: x[1], reverse=True)[0:15]
 
-    return sorted_words_friq
+    return sorted_words_freq
 
 
 # In[18]:
@@ -312,7 +312,7 @@ word = input('Введите слово c маленькой буквы: ')
 # In[ ]:
 
 
-friq_graph('lightskyblue', word, 'C:/Users/alfyn/ВКР/partuq_word_in_dif_media.png')
+freq_graph('lightskyblue', word, 'C:/Users/alfyn/ВКР/partuq_word_in_dif_media.png')
 
 
 # In[23]:
