@@ -135,6 +135,7 @@ def getting_condition_list_user(media, date):
 
     return (current_unix)
 
+
 us_date = datetime.today().strftime('%Y-%m-%d')
 
 condition_list_tass = getting_condition_list_user(1, us_date)
@@ -153,7 +154,22 @@ db_col_mediazona = retrieve_by_date_and_media(condition_list_mediazona)
 db_col_lenta = retrieve_by_date_and_media(condition_list_lenta)
 db_col_rbc = retrieve_by_date_and_media(condition_list_rbc)
 
-
+#
+#def generate_data(date):
+#    global condition_list_tass
+#    global condition_list_meduza
+#    global condition_list_interfax
+#    global condition_list_ria
+#    global condition_list_mediazona
+#    global condition_list_lenta
+#    global condition_list_rbc
+#    global db_col_meduza
+#    global db_col_tass
+#    global db_col_interfax
+#    global db_col_ria
+#    global db_col_mediazona
+#    global db_col_lenta
+#   global db_col_rbc
 
 stopwords = ['а', 'в', 'г', 'е', 'ж', 'и', 'к', 'м', 'о', 'об', 'с', 'т', 'у', 'я', 'бы', 'во', 'вы', 'да', 'до', 
              'ее', 'ей', 'ею', 'её', 'же', 'за', 'из', 'им', 'их', 'ли', 'мы', 'на', 'не', 'ни', 'но', 'ну', 
@@ -247,6 +263,10 @@ def preprocess_text(db_col):
 
 
 processed_words_tass = preprocess_text(db_col_tass)
+# переделать функциюм generate_data чтобы она принимала два аргумента: id СМИ(или любой ключ уникальный для сми) и дату
+# и перегенеривала данные отдельно по конкретному сми
+# если processed_words_tass пустой, перегенериваем db_col_tass через вызов функции generate_data от вчерашнего дня
+# и так для каждого сми
 processed_words_meduza = preprocess_text(db_col_meduza)
 processed_words_interfax = preprocess_text(db_col_interfax)
 processed_words_ria = preprocess_text(db_col_ria)
@@ -422,8 +442,9 @@ def freq_graph(color, word, file_name):
         #            '{:1.2f}'.format(width).replace('.00', ''),
         #            ha='center', va='center')
 
-        plt.title(f'Частота употребления слова {word.capitalize()} на 1000 слов', loc='left', pad=30)
-        plt.annotate('source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0,0), (-10, -60), fontsize=12,
+        plt.title(f'Частота употребления слова {word.capitalize()} на 1000 слов', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+        plt.annotate('*Обращаем ваще внимание, что с 23 апреля 2021 года Медуза признана иностанным агентом \n'
+                     'source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0,0), (-10, -80), fontsize=16,
                      xycoords='axes fraction', textcoords='offset points', va='bottom')
 
         fig.savefig("C:/Users/alfyn/ВКР/" + file_name)
@@ -473,29 +494,30 @@ def graph_of_top(processed, color, file_name, media_name):
     graph.set(xlabel=None, ylabel=None)
 
     for p in graph.patches: #for annotate each bar in our plot
-        width = p.get_width()
-        plt.text(2 + p.get_width(), p.get_y() + 0.55 * p.get_height(),
-                 '{:1.2f}'.format(width).replace('.00', ''),
-                 ha='center', va='center')
+        bar_an ='{:.0f}'.format(p.get_width())
+        width, height = p.get_width(), p.get_height()
+        x = p.get_x()+width+0.2
+        y = p.get_y()+height/1.5
+        ax.annotate(bar_an, (x, y), fontsize=14)
 
     if media_name == 'все':
-        plt.title('ТОП-15 слов в ТАСС, Медузе, Интерфаксе, РИА новостях, РБК, Ленте.ru', loc='left', pad=30)
+        plt.title('ТОП-15 слов в ТАСС, Медузе, Интерфаксе, РИА новостях, РБК, Ленте.ru', fontdict={'fontweight': 'bold'},  loc='left', pad=30)
     elif media_name == 'тасс':
-        plt.title('ТОП-15 слов в ТАСС', loc='left', pad=30)
+        plt.title('ТОП-15 слов в ТАСС', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
     elif media_name == 'медуза':
-        plt.title('ТОП-15 слов в Медузе', loc='left', pad=30)
+        plt.title('ТОП-15 слов в Медузе (является иностранным агентом)', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
     elif media_name == 'интерфакс':
-        plt.title('ТОП-15 слов в Интерфакс', loc='left', pad=30)
-    elif media_name == 'РБК':
-        plt.title('ТОП-15 слов в РБК', loc='left', pad=30)
+        plt.title('ТОП-15 слов в Интерфакс', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'рбк':
+        plt.title('ТОП-15 слов в РБК', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
     elif media_name == 'медиазона':
-        plt.title('ТОП-15 слов в Медиазоне', loc='left', pad=30)
+        plt.title('ТОП-15 слов в Медиазоне', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
     elif media_name == 'риа':
-        plt.title('ТОП-15 слов в РИА новостях', loc='left', pad=30)
+        plt.title('ТОП-15 слов в РИА новостях', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
     elif media_name == 'лента':
-        plt.title('ТОП-15 слов в Ленте.ru', loc='left', pad=30)
+        plt.title('ТОП-15 слов в Ленте.ru', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
 
-    plt.annotate('source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0, 0), (-10, -60), fontsize=12,
+    plt.annotate('source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0, 0), (-10, -50), fontsize=16,
                  xycoords='axes fraction', textcoords='offset points', va='bottom')
 
     fig.savefig("C:/Users/alfyn/ВКР/" + file_name + '.png')
@@ -538,6 +560,8 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, 'Выберите СМИ: ', reply_markup=keyboard_2)
 
     elif call.data == "graph_3":
+        if len(processed_words_all) == 0:
+            return
         graph_of_top(processed_words_all, 'hotpink', user_id, 'все')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в новостях шести СМИ')
@@ -545,6 +569,8 @@ def callback_worker(call):
         img_top.close()
 
     elif call.data == "graph_top_1":
+        if len(processed_words_tass) == 0:
+            return
         graph_of_top(processed_words_tass, 'deepskyblue', user_id, 'тасс')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в ТАСС')
@@ -552,6 +578,8 @@ def callback_worker(call):
         img_top.close()
 
     elif call.data == "graph_top_2":
+        if len(processed_words_interfax) == 0:
+            return
         graph_of_top(processed_words_interfax, 'deepskyblue', user_id, 'интерфакс')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в Интерфаксе')
@@ -559,13 +587,17 @@ def callback_worker(call):
         img_top.close()
 
     elif call.data == "graph_top_3":
+        if len(processed_words_meduza) == 0:
+            return
         graph_of_top(processed_words_meduza, 'palegreen', user_id, 'медуза')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
-        bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в Медузе')
+        bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в Медузе (является иностранным агентом)')
         bot.send_photo(call.message.chat.id, img_top)
         img_top.close()
 
     elif call.data == "graph_top_4":
+        if len(processed_words_ria) == 0:
+            return
         graph_of_top(processed_words_ria, 'palevioletred', user_id, 'риа')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в РИА новостях')
@@ -573,13 +605,17 @@ def callback_worker(call):
         img_top.close()
 
     elif call.data == "graph_top_5":
-        graph_of_top(processed_words_rbk, 'palevioletred', user_id, 'рбк')
+        if len(processed_words_rbc) == 0:
+            return
+        graph_of_top(processed_words_rbc, 'palevioletred', user_id, 'рбк')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в РБК')
         bot.send_photo(call.message.chat.id, img_top)
         img_top.close()
 
-    elif call.data == "graph_top_5":
+    elif call.data == "graph_top_6":
+        if len(processed_words_lenta) == 0:
+            return
         graph_of_top(processed_words_lenta, 'palevioletred', user_id, 'лента')
         img_top = open('C:/Users/alfyn/ВКР/' + user_id + '.png', 'rb')
         bot.send_message(call.message.chat.id, 'График показывает ТОП-15 слов в Ленте.ru')

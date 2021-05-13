@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[111]:
 
 
 import requests
@@ -52,7 +52,7 @@ import plotly.offline
 import ast
 
 
-# In[4]:
+# In[112]:
 
 
 def retrieve_proc_text(media_id):
@@ -75,7 +75,7 @@ def retrieve_proc_text(media_id):
     print('База данных закрыта')
 
 
-# In[ ]:
+# In[141]:
 
 
 def freq_graph(color, word, file_name):
@@ -94,7 +94,7 @@ def freq_graph(color, word, file_name):
     # all four loops are similar
     quan_tass = 0
     tass_words = 0
-    for w in processed_words_tass:
+    for w in proc_text_tass:
         if w == str(word): 
             quan_tass = quan_tass + 1
         else:
@@ -112,7 +112,7 @@ def freq_graph(color, word, file_name):
 
     quan_meduza = 0
     meduza_words = 0
-    for w in processed_words_meduza:
+    for w in proc_text_meduza:
         if w == str(word):
             quan_meduza = quan_meduza + 1
         else:
@@ -129,7 +129,7 @@ def freq_graph(color, word, file_name):
     
     quan_interfax = 0
     interfax_words = 0
-    for w in processed_words_interfax:
+    for w in proc_text_interfax:
         if w == str(word):
             quan_interfax = quan_interfax + 1
         else:
@@ -146,7 +146,7 @@ def freq_graph(color, word, file_name):
 
     quan_ria = 0
     ria_words = 0
-    for w in processed_words_ria:
+    for w in proc_text_ria:
         if w == str(word):
             quan_ria = quan_ria + 1
         else:
@@ -163,7 +163,7 @@ def freq_graph(color, word, file_name):
 
     quan_lenta = 0
     lenta_words = 0
-    for w in processed_words_lenta:
+    for w in proc_text_lenta:
         if w == str(word):
             quan_lenta = quan_lenta + 1
         else:
@@ -180,7 +180,7 @@ def freq_graph(color, word, file_name):
 
     quan_rbc = 0
     rbc_words = 0
-    for w in processed_words_rbc:
+    for w in proc_text_rbc:
         if w == str(word):
             quan_rbc = quan_rbc + 1
         else:
@@ -202,9 +202,9 @@ def freq_graph(color, word, file_name):
         for_graph.columns = ['СМИ', 'Частота употребления слова']
 
 
-        plotly.offline.plot({"data": [go.Table(header=dict(values=['СМИ', 'Абсолютная частота', 'Количество слов']), cells=dict(values=lst2))],
-                        "layout": go.Layout(title="Абсолютная частота слова")},
-                        image='png', image_filename=file_name)
+#         plotly.offline.plot({"data": [go.Table(header=dict(values=['СМИ', 'Абсолютная частота', 'Количество слов']), cells=dict(values=lst2))],
+#                         "layout": go.Layout(title="Абсолютная частота слова")},
+#                         image='png', image_filename=file_name)
 
     
         sns.set(font = 'Verdana', font_scale=1.5, style = "white")
@@ -213,18 +213,22 @@ def freq_graph(color, word, file_name):
         fig, ax = plt.subplots(figsize=fig_dims, dpi=400, sharex=True)
         ax.grid(False)
         ax.spines["top"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
+#         ax.spines["bottom"].set_visible(False)
         ax.spines["right"].set_visible(False)
         ax.spines["left"].set_visible(False)
-        ax.axes.xaxis.set_visible(False)
+#         ax.axes.xaxis.set_visible(False)
 
         graph = sns.barplot(x=for_graph['Частота употребления слова'], y=for_graph['СМИ'], color=color, ax=ax, orient='h')
         graph.set(xlabel=None, ylabel=None)
-        for p in graph.patches:
-            width = p.get_width()
-            plt.text(0.1 + p.get_width(), p.get_y() + 0.55 * p.get_height(),
-                    '{:1.2f}'.format(width).replace('.00', ''),
-                    ha='center', va='center')
+#         for p in graph.patches:
+#             width = p.get_width()
+#             plt.text(0.19 + p.get_width(), p.get_y() + 0.55 * p.get_height(),
+#                     '{:1.2f}'.format(width).replace('.00', ''),
+#                     ha='center', va='center')
+        plt.title(f'Частота употребления слова {word.capitalize()} на 1000 слов', fontdict = {'fontweight': 'bold'}, loc='left', pad=30)
+    
+        plt.annotate('source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0,0), (-10, -80), fontsize=15, 
+                     xycoords='axes fraction', textcoords='offset points', va='bottom')
 
         fig.savefig("C:/Users/alfyn/ВКР/" + file_name)
 
@@ -236,7 +240,7 @@ def freq_graph(color, word, file_name):
         return error_message
 
 
-# In[17]:
+# In[5]:
 
 
 def words_top(processed_words_media):
@@ -258,10 +262,18 @@ def words_top(processed_words_media):
     return sorted_words_freq
 
 
-# In[18]:
+# In[222]:
 
 
-def graph_of_top(processed, color, file_name):
+def graph_of_top(processed, color, file_name, media_name):
+    
+    """The program calculates the TOP-15 words in each media or in all media. 
+        Param processed: texts
+        Param color: color of bars
+        Param file_name: how you want to name your file
+        Param media: witch media ('тасс', 'медуза', 'интерфакс', 'риа', 'медиазона', 'рбк', 'лента', 'все')
+    """
+        
     df = pd.DataFrame(words_top(processed))
     df.columns = ['Слово', 'Количество повторений']
 
@@ -280,17 +292,39 @@ def graph_of_top(processed, color, file_name):
     graph.set(xlabel=None, ylabel=None)
 
     for p in graph.patches: #for annotate each bar in our plot
-        width = p.get_width()
-        plt.text(2 + p.get_width(), p.get_y() + 0.55 * p.get_height(),
-                 '{:1.2f}'.format(width).replace('.00', ''),
-                 ha='center', va='center')
+        bar_annotat ='{:.0f}'.format(p.get_width())
+        width, height = p.get_width(), p.get_height()
+        x=p.get_x()+width+0.2
+        y=p.get_y()+height/1.5
+        ax.annotate(bar_annotat,(x,y), fontsize=14)
+        
+    if media_name == 'все':
+        plt.title('ТОП-15 слов в ТАСС, Медузе (является иноагентом), Интерфаксе, РИА новостях, РБК, Ленте.ru', fontdict={'fontweight': 'bold'},  loc='left', pad=30)
+    elif media_name == 'тасс':
+        plt.title('ТОП-15 слов в ТАСС', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'медуза':
+        plt.title('ТОП-15 слов в Медузе (является иноагентом)', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'интерфакс':
+        plt.title('ТОП-15 слов в Интерфакс', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'РБК':
+        plt.title('ТОП-15 слов в РБК', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'медиазона':
+        plt.title('ТОП-15 слов в Медиазоне', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'риа':
+        plt.title('ТОП-15 слов в РИА новостях', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    elif media_name == 'лента':
+        plt.title('ТОП-15 слов в Ленте.ru', fontdict={'fontweight': 'bold'}, loc='left', pad=30)
+    
+    
+    plt.annotate('source: telegram-канал "Слово дня" (t.me/novosti_slovo_dnya)', (0,0), (-10, -60), fontsize=12, 
+                xycoords='axes fraction', textcoords='offset points', va='bottom')
 
     fig.savefig("C:/Users/alfyn/ВКР/" + file_name + '.png')
 
     return graph
 
 
-# In[20]:
+# In[115]:
 
 
 proc_text_all = ast.literal_eval(retrieve_proc_text('0')[0][0]) #сразу извлекаем список из строки
@@ -303,19 +337,19 @@ proc_text_lenta = ast.literal_eval(retrieve_proc_text('6')[0][0])
 proc_text_rbc = ast.literal_eval(retrieve_proc_text('7')[0][0])
 
 
-# In[ ]:
+# In[212]:
 
 
 word = input('Введите слово c маленькой буквы: ')
 
 
-# In[ ]:
+# In[213]:
 
 
-freq_graph('lightskyblue', word, 'C:/Users/alfyn/ВКР/partuq_word_in_dif_media.png')
+freq_graph('lightskyblue', word, 'partuq_word_in_dif_media.png')
 
 
-# In[23]:
+# In[147]:
 
 
 words_top_tass = words_top(proc_text_tass)
@@ -327,14 +361,8 @@ words_top_rbc = words_top(proc_text_rbc)
 words_top_all = words_top(proc_text_all)
 
 
-# In[24]:
+# In[224]:
 
 
-words_top_tass
-
-
-# In[28]:
-
-
-graph_of_top(proc_text_all, 'hotpink', 'C:/Users/alfyn/ВКР/top.png')
+graph_of_top(proc_text_all, 'hotpink', 'top', 'все')
 
